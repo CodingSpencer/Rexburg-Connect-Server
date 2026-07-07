@@ -3,8 +3,13 @@ import express from 'express';
 import type { Request, Response } from 'express';
 import mongoose from 'mongoose';
 
+import { toNodeHandler } from "better-auth/node";
+import { auth } from './lib/auth.js';
+
 const app = express();
 const PORT = process.env.PORT || 5000;
+
+app.all('api/auth/*', toNodeHandler(auth));
 
 app.use(express.json());
 

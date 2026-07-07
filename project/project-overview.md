@@ -7,7 +7,7 @@ Rexburg-Connect-Server is the backend service for the Rexburg Connect platform. 
 - Node.js with Express
 - TypeScript
 - MongoDB with Mongoose
-- JSON Web Tokens for authentication-related flows
+- better-auth for authentication and session management
 - Swagger-based API documentation support
 
 ## Repository structure
