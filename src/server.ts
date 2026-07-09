@@ -9,14 +9,25 @@ import { auth } from './lib/auth.js';
 
 const app = express();
 
+const allowedOrigins = [
+  'http://localhost:4321',
+  'https://rexburg-connect-client.netlify.app'
+];
+
 app.use(cors({
-  origin: 'http://localhost:4321',
+  origin: (origin, callback) => {
+    if (!origin || allowedOrigins.includes(origin)) {
+      callback(null, true);
+    } else {
+      callback(new Error('Not allowed by CORS'));
+    }
+  },
   credentials: true
 }));
 
 const PORT = process.env.PORT || 5000;
 
-app.all(/\/api\/auth\/.*/, toNodeHandler(auth));
+app.all('/api/auth/{*any}', toNodeHandler(auth));
 
 app.use(express.json());
 
