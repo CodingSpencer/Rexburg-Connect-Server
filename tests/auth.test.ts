@@ -1,7 +1,7 @@
 import test, { mock } from 'node:test';
 import assert from 'node:assert/strict';
-import { auth } from '../lib/auth.js';
-import { authenticateToken } from '../middleware/auth.middleware.js';
+import { auth } from '../src/lib/auth.js';
+import { authenticateToken } from '../src/middleware/auth.middleware.js';
 
 // Clean up all stubs automatically after each test runs
 test.afterEach(() => {
