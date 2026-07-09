@@ -27,7 +27,9 @@ app.use(cors({
 
 const PORT = process.env.PORT || 5000;
 
-app.all('/api/auth/{*any}', toNodeHandler(auth));
+app.use("/api/auth", (req, res, next) => {
+  return toNodeHandler(auth)(req, res);
+});
 
 app.use(express.json());
 
