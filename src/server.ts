@@ -1,4 +1,3 @@
-import 'dotenv/config';
 import express from 'express';
 import cors from 'cors';
 import type { Request, Response } from 'express';
@@ -6,6 +5,9 @@ import mongoose from 'mongoose';
 
 import { toNodeHandler } from "better-auth/node";
 import { auth } from './lib/auth.js';
+import { loadEnv } from './lib/env.js';
+
+loadEnv();
 
 const app = express();
 
