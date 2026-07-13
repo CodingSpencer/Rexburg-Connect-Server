@@ -1,6 +1,9 @@
 import { MongoClient, ServerApiVersion } from "mongodb";
 import { products as eventsData } from "./database/events.js";
 import * as argon2 from "argon2";
+import { loadEnv } from "../lib/env.ts";
+
+loadEnv();
 
 const uri = process.env.MONGO_URI || "";
 const dbName = process.env.MONGO_DATABASE || "rexburg_connect";

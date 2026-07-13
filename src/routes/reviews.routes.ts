@@ -10,7 +10,7 @@ router.use(authenticateToken);
 router.post('/reviews', async (req: AuthenticatedRequest, res, next) => {
     try {
         // Highly secure context
-        const creatorId = req.user?.userId;
+        const creatorId = req.user?.id;
         // Construct and save new review
         res.status(201).json({ message: 'Review created successfully!' });
     } catch (error) {

@@ -1,37 +1,30 @@
 import type { Request, Response, NextFunction } from "express";
-import jwt from "jsonwebtoken";
-import { UnauthorizedError } from "../errors/UnauthorizedError.mjs";
+import { fromNodeHeaders } from "better-auth/node";
+import { auth } from "../lib/auth.js";
 
-interface TokenPayload {
-    userId: string;
-    email: string;
-}
-
-// Extend Express Request locally in not globally
+// 1. Define a targeted wrapper type
 export interface AuthenticatedRequest extends Request {
-    user?: TokenPayload;
+    user?: typeof auth.$Infer.Session.user;
 }
 
-export const authenticateToken = (req: AuthenticatedRequest, res: Response, next: NextFunction) => {
-    const authHeader = req.headers['authorization'];
-    // Expecting format: "Bearer <token>"
-    const token = authHeader && authHeader.split(' ')[1];
+export const authenticateToken = async (
+    req: Request, 
+    res: Response, 
+    next: NextFunction
+) => {
+    try {
+        const session = await auth.api.getSession({
+            headers: fromNodeHeaders(req.headers),
+        });
 
-    if (!token) {
-        throw new UnauthorizedError('Authentication token missing.');
-    }
-
-    const jwtSecret = process.env.JWT_SECRET;
-    if (!jwtSecret) {
-        throw new UnauthorizedError('JWT secret missing.');
-    }
-
-    jwt.verify(token, jwtSecret, (err, decoded) => {
-        if (err) {
-            throw new UnauthorizedError('Invalid authentication token.');
+        if (!session) {
+            return res.status(401).json({ error: "Unauthorized: Invalid or missing session." });
         }
 
-        req.user = decoded as TokenPayload;
+        // 2. Cast standard request to your custom interface during assignment
+        (req as AuthenticatedRequest).user = session.user; 
         next();
-    });
+    } catch (error) {
+        next(error);
+    }
 };
