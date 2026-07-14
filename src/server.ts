@@ -1,39 +1,12 @@
-import express from 'express';
-import cors from 'cors';
-import type { Request, Response } from 'express';
-import mongoose from 'mongoose';
+import mongoose from "mongoose";
 
-import { toNodeHandler } from "better-auth/node";
-import { auth } from './lib/auth.js';
-import { loadEnv } from './lib/env.js';
+import app from "./app.js";
+import { auth } from "./lib/auth.js";
+import { loadEnv } from "./lib/env.js";
 
 loadEnv();
 
-const app = express();
-
-const allowedOrigins = [
-  'http://localhost:4321',
-  'https://rexburg-connect-client.netlify.app'
-];
-
-app.use(cors({
-  origin: (origin, callback) => {
-    if (!origin || allowedOrigins.includes(origin)) {
-      callback(null, true);
-    } else {
-      callback(new Error('Not allowed by CORS'));
-    }
-  },
-  credentials: true
-}));
-
-const PORT = process.env.PORT || 5000;
-
-app.use("/api/auth", (req, res, next) => {
-  return toNodeHandler(auth)(req, res);
-});
-
-app.use(express.json());
+const PORT = process.env.PORT || 5001;
 
 const seedTestUser = async () => {
   try {
@@ -42,36 +15,43 @@ const seedTestUser = async () => {
         name: "Test User",
         email: "test@example.com",
         password: "password123",
-      }
+      },
     });
+
     console.log("🌱 Test user created successfully:", user);
-  } catch (error) {
-    // If the user already exists, it will throw an error, which is fine for testing!
-    console.log("ℹ️ Test user signup bypassed (likely already exists)");
+  } catch {
+    console.log(
+      "ℹ️ Test user signup bypassed because it likely already exists."
+    );
   }
 };
 
-// Connect to MongoDB with error typing
-mongoose.connect(process.env.MONGO_URI || '')
-  .then(async () => {
-    console.log('✅ Successfully connected to MongoDB Atlas!');
-    
-    // Call the seeding function here
-    await seedTestUser();
-  })
-  .catch((err: unknown) => {
-    if (err instanceof Error) {
-      console.error('❌ MongoDB connection error:', err.message);
-    } else {
-      console.error('❌ Unknown MongoDB connection error:', err);
+const startServer = async () => {
+  try {
+    const mongoUri = process.env.MONGO_URI;
+
+    if (!mongoUri) {
+      throw new Error("MONGO_URI is missing from the .env file.");
     }
-});
 
-// Sample route
-app.get('/', (_req: Request, res: Response) => {
-  res.send('Server is running and database is connected!');
-});
+    await mongoose.connect(mongoUri);
 
-app.listen(PORT, () => {
-  console.log(`Server is running on port ${PORT}`);
-});
+    console.log("✅ Successfully connected to MongoDB Atlas!");
+
+    await seedTestUser();
+
+    app.listen(PORT, () => {
+      console.log(`Server is running on port ${PORT}`);
+    });
+  } catch (error: unknown) {
+    if (error instanceof Error) {
+      console.error("❌ Server startup error:", error.message);
+    } else {
+      console.error("❌ Unknown server startup error:", error);
+    }
+
+    process.exit(1);
+  }
+};
+
+void startServer();
