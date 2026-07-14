@@ -7,17 +7,35 @@ type AuthInstance = ReturnType<typeof betterAuth>;
 let _auth: AuthInstance | null = null;
 
 export function initAuth(db: Db) {
+    const baseURL = process.env.BETTER_AUTH_URL || "http://localhost:3001";
+    const isProduction = baseURL.includes("onrender.com");
+
     _auth = betterAuth({
         database: mongodbAdapter(db),
-        baseURL: process.env.BETTER_AUTH_URL || "http://localhost:3001/api/auth",
+        baseURL,
         secret: process.env.BETTER_AUTH_SECRET,
-        url: process.env.BETTER_AUTH_URL,
         trustedOrigins: [
             "http://localhost:4321",
             "https://rexburg-connect-client.netlify.app",
         ],
         emailAndPassword: {
             enabled: true,
+        },
+        advanced: {
+            cookies: {
+                sessionToken: {
+                    attributes: {
+                        sameSite: isProduction ? "none" : "lax",
+                        secure: isProduction,
+                    },
+                },
+                sessionData: {
+                    attributes: {
+                        sameSite: isProduction ? "none" : "lax",
+                        secure: isProduction,
+                    },
+                },
+            },
         },
     }) as unknown as AuthInstance;
     return _auth;
