@@ -1,9 +1,7 @@
 import express from "express";
 import cors from "cors";
-import { toNodeHandler } from "better-auth/node";
 
 import routes from "./routes/index.mjs";
-import { auth } from "./lib/auth.js";
 
 const app = express();
 
@@ -26,11 +24,7 @@ app.use(
   })
 );
 
-// Better Auth routes
-app.all("/api/auth/*splat", toNodeHandler(auth));
-
 app.use(express.json());
-
 
 // All other backend routes
 app.use("/api", routes);

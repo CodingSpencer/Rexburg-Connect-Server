@@ -1,7 +1,9 @@
 import mongoose from "mongoose";
+import type { Db } from "mongodb";
+import { toNodeHandler } from "better-auth/node";
 
 import app from "./app.js";
-import { auth } from "./lib/auth.js";
+import { initAuth, getAuth } from "./lib/auth.js";
 import { loadEnv } from "./lib/env.js";
 
 loadEnv();
@@ -10,6 +12,7 @@ const PORT = process.env.PORT || 5001;
 
 const seedTestUser = async () => {
   try {
+    const auth = getAuth();
     const user = await auth.api.signUpEmail({
       body: {
         name: "Test User",
@@ -37,6 +40,16 @@ const startServer = async () => {
     await mongoose.connect(mongoUri);
 
     console.log("✅ Successfully connected to MongoDB Atlas!");
+
+    // Initialize better-auth with the MongoDB adapter
+    const db = mongoose.connection.db;
+    if (!db) {
+      throw new Error("MongoDB connection is not fully established.");
+    }
+    initAuth(db as unknown as Db);
+
+    // Register better-auth routes AFTER auth is initialized
+    app.all("/api/auth/*splat", toNodeHandler(getAuth()));
 
     await seedTestUser();
 
