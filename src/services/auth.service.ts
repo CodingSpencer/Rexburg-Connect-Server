@@ -5,10 +5,10 @@ import type { LoginDto, AuthResponse } from "../models/User.js";
 
 export class AuthService {
     public static async login(credentials: LoginDto): Promise<AuthResponse> {
-        const { email, password } = credentials;
+        const { profile, password } = credentials;
 
         // Select the password field since hidden and execute the query
-        const user = await User.findOne({ email }).select('+password').exec();
+        const user = await User.findOne({ profile }).select('+password').exec();
         if (!user) {
             throw new UnauthorizedError('Invalid credentials.');
         }
@@ -31,7 +31,7 @@ export class AuthService {
         }
 
         const token = jwt.sign(
-            { userId: user._id, email: user.email },
+            { userId: user._id, profile: user.profile, email: user.email },
             jwtSecret,
             // FIX 2: Cast as 'any' to bypass jsonwebtoken's strict union string check
             { expiresIn: jwtExpires as any }
@@ -41,6 +41,7 @@ export class AuthService {
             token,
             user: {
                 id: user._id,
+                profile: user.profile,
                 email: user.email,
                 name: user.name,
             }

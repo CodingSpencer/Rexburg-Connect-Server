@@ -2,7 +2,7 @@ import { Schema, model, Document, Types } from "mongoose";
 import bcrypt from 'bcrypt';
 
 export interface LoginDto {
-    email: string;
+    profile: string;
     password?: string;
 }
 
@@ -10,6 +10,7 @@ export interface AuthResponse {
     token: string;
     user: {
         id: any; // Or Types.ObjectId
+        profile?: string;
         email: string;
         name: string;
     };
@@ -17,6 +18,7 @@ export interface AuthResponse {
 
 export interface IUser extends Document {
     _id: Types.ObjectId;
+    profile: string;
     email: string;
     password?: string;
     name: string;
@@ -26,6 +28,12 @@ export interface IUser extends Document {
 }
 
 const UserSchema = new Schema<IUser>({
+    profile: {
+        type: String,
+        required: true,
+        unique: true,
+        trim: true,
+    },
     email: {
         type: String,
         required: true,
