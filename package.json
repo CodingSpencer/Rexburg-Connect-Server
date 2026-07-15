@@ -5,7 +5,7 @@
   "main": "index.js",
   "scripts": {
     "test": "npm run build && node --test dist/tests/auth.test.js",
-    "start": "npm run build && node dist/src/server.js",
+    "start": "node --experimental-strip-types src/server.ts",
     "build": "npx tsc",
     "dev": "tsx --watch src/server.ts",
     "init-db": "node src/database/initDb.js"
