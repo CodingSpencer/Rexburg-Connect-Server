@@ -22,6 +22,10 @@ export function initAuth(db: Db) {
             enabled: true,
         },
         advanced: {
+            ipAddress: {
+                ipAddressHeaders: ["x-forwarded-for", "x-real-ip"],
+                trustedProxies: [], // empty means trust all proxies; set to specific IPs in production if needed
+            },
             cookies: {
                 sessionToken: {
                     attributes: {

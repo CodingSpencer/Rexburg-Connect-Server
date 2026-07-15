@@ -5,6 +5,9 @@ import routes from "./routes/index.mjs";
 
 const app = express();
 
+// Trust proxy headers so that req.ip reflects the client IP from x-forwarded-for
+app.set("trust proxy", true);
+
 const allowedOrigins = [
   "http://localhost:4321",
   "https://rexburg-connect-client.netlify.app",
