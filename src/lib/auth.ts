@@ -8,7 +8,7 @@ let _auth: AuthInstance | null = null;
 
 export function initAuth(db: Db) {
     const baseURL = process.env.BETTER_AUTH_URL || "http://localhost:3001";
-    const isProduction = baseURL.includes("onrender.com");
+    const isProduction = process.env.NODE_ENV === "production" || baseURL.includes("onrender.com");
 
     _auth = betterAuth({
         database: mongodbAdapter(db),
