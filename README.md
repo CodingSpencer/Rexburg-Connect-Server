@@ -1,7 +1,7 @@
-# Rexburg-Connect-Server
+## Rexburg Connect
 
-## Authentication
+- [Netlify](https://rexburg-connect-client.netlify.app/)
+- [Render](https://rexburg-connect-server.onrender.com)
 
-This backend uses `better-auth` for authentication and session management. The auth endpoints are mounted at `api/auth/*` via `src/server.ts`.
-
-See `project/AUTH.md` for details on the current auth flow and how protected routes are validated.
+- [Rexburg Connect Client](https://github.com/CodingSpencer/Rexburg-Connect-Client)
+- [Rexburg Connect Server](https://github.com/CodingSpencer/Rexburg-Connect-Server)
