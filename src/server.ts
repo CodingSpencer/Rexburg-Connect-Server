@@ -8,7 +8,10 @@ import { loadEnv } from "./lib/env.js";
 
 loadEnv();
 
-const PORT = process.env.PORT || 5001;
+const PORT = Number(process.env.PORT) || 5001;
+const HOST = "0.0.0.0";
+
+console.log(`🚀 Starting server on ${HOST}:${PORT}...`);
 
 const seedTestUser = async () => {
   try {
@@ -54,8 +57,8 @@ const startServer = async () => {
 
     await seedTestUser();
 
-    app.listen(PORT, () => {
-      console.log(`Server is running on port ${PORT}`);
+    app.listen(PORT, HOST, () => {
+      console.log(`Server is running on http://${HOST}:${PORT}`);
     });
   } catch (error: unknown) {
     if (error instanceof Error) {
