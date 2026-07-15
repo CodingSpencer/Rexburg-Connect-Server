@@ -49,7 +49,8 @@ const startServer = async () => {
     initAuth(db as unknown as Db);
 
     // Register better-auth routes AFTER auth is initialized
-    app.all("/api/auth/*splat", toNodeHandler(getAuth()));
+    // Express 5 uses path-to-regexp v8 — "*" matches any characters, no "splat" suffix
+    app.all("/api/auth/*", toNodeHandler(getAuth()));
 
     await seedTestUser();
 
