@@ -28,8 +28,10 @@ export function initAuth(db: Db) {
             },
             cookies: {
                 sessionToken: {
-                    sameSite: isProduction ? "none" : "lax",
-                    secure: isProduction,
+                    attributes: {
+                        sameSite: isProduction ? "none" : "lax",
+                        secure: isProduction,
+                    },
                 },
             },
         },
