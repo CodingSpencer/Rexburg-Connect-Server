@@ -11,7 +11,11 @@ loadEnv();
 const PORT = Number(process.env.PORT) || 5001;
 const HOST = "0.0.0.0";
 
-console.log(`🚀 Starting server on ${HOST}:${PORT}...`);
+// Start listening immediately so Render detects the port.
+// MongoDB connection happens asynchronously afterward.
+const server = app.listen(PORT, HOST, () => {
+  console.log(`Server is running on http://${HOST}:${PORT}`);
+});
 
 const seedTestUser = async () => {
   try {
@@ -32,12 +36,13 @@ const seedTestUser = async () => {
   }
 };
 
-const startServer = async () => {
+const init = async () => {
   try {
     const mongoUri = process.env.MONGO_URI;
 
     if (!mongoUri) {
-      throw new Error("MONGO_URI is missing from the .env file.");
+      console.error("❌ MONGO_URI is missing. Set it in Render environment variables.");
+      return;
     }
 
     await mongoose.connect(mongoUri);
@@ -56,19 +61,13 @@ const startServer = async () => {
     app.all("/api/auth/*splat", toNodeHandler(getAuth()));
 
     await seedTestUser();
-
-    app.listen(PORT, HOST, () => {
-      console.log(`Server is running on http://${HOST}:${PORT}`);
-    });
   } catch (error: unknown) {
     if (error instanceof Error) {
       console.error("❌ Server startup error:", error.message);
     } else {
       console.error("❌ Unknown server startup error:", error);
     }
-
-    process.exit(1);
   }
 };
 
-void startServer();
+void init();
