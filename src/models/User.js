@@ -17,6 +17,12 @@ const UserSchema = new Schema({
         type: String,
         required: true,
     },
+    profileName: {
+        type: String,
+        required: true,
+        unique: true,
+        trim: true,
+    },
 }, { timestamps: true });
 // Hash password before saving
 UserSchema.pre('save', async function () {

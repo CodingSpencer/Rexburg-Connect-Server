@@ -21,6 +21,15 @@ export function initAuth(db: Db) {
         emailAndPassword: {
             enabled: true,
         },
+        user: {
+            additionalFields: {
+                profileName: {
+                    type: "string",
+                    required: true,
+                    unique: true,
+                },
+            },
+        },
         advanced: {
             ipAddress: {
                 ipAddressHeaders: ["x-forwarded-for", "x-real-ip"],
