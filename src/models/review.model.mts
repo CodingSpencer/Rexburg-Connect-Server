@@ -24,6 +24,12 @@ import {
         required: true,
         trim: true,
       },
+
+      profileName: {
+        type: String,
+        required: false,
+        trim: true,
+      },
   
       rating: {
         type: Number,

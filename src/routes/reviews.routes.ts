@@ -83,10 +83,13 @@ import {
             ? req.body.comment
             : "";
   
+        const profileName = (user as { profileName?: string }).profileName;
+
         const review = await createReview({
           eventId: req.params.eventId,
           userId: user.id,
           userName: user.name || "Rexburg Connect User",
+          profileName: profileName || "Rexburg Connect User",
           rating,
           comment,
         });

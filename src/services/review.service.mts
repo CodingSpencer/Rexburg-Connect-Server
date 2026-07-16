@@ -1,4 +1,4 @@
-import { isValidObjectId } from "mongoose";
+import mongoose, { isValidObjectId } from "mongoose";
 import { EventModel } from "../models/event.model.mjs";
 import { ReviewModel } from "../models/review.model.mjs";
 
@@ -6,6 +6,7 @@ export interface CreateReviewInput {
   eventId: string;
   userId: string;
   userName: string;
+  profileName: string;
   rating: number;
   comment: string;
 }
@@ -22,6 +23,7 @@ export async function createReview(input: CreateReviewInput) {
     eventId,
     userId,
     userName,
+    profileName,
     rating,
     comment,
   } = input;
@@ -78,6 +80,7 @@ export async function createReview(input: CreateReviewInput) {
     eventId,
     userId,
     userName,
+    profileName,
     rating,
     comment: cleanedComment,
   });
@@ -122,8 +125,41 @@ export async function getReviewsForEvent(eventId: string) {
           ).toFixed(1)
         );
 
+  // Attach current profileName from the User collection for every review.
+  // Uses string comparison on _id to avoid type coercion issues.
+  const userIds = reviews.map((r) => r.userId);
+  const validIds = userIds.filter((id) => isValidObjectId(id));
+
+  let profileNameById = new Map<string, string>();
+
+  if (validIds.length > 0) {
+    try {
+      // Query the better-auth "user" collection directly (not the Mongoose "users" collection)
+      const db = mongoose.connection.db!;
+      const users = await db
+        .collection("user")
+        .find({ _id: { $in: validIds.map((id) => new mongoose.Types.ObjectId(id)) } })
+        .project({ profileName: 1 })
+        .toArray();
+
+      profileNameById = new Map(
+        users.map((u: any) => [String(u._id), u.profileName || ""])
+      );
+    } catch {
+      // If the lookup fails for any reason, reviews will keep their stored profileName
+    }
+  }
+
+  const reviewsWithProfile = reviews.map((review) => ({
+    ...review,
+    profileName:
+      profileNameById.get(review.userId) ||
+      review.profileName ||
+      review.userName,
+  }));
+
   return {
-    reviews,
+    reviews: reviewsWithProfile,
     reviewCount,
     averageRating,
   };
