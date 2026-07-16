@@ -29,6 +29,9 @@ export function initAuth(db: Db) {
                     unique: true,
                 },
             },
+            deleteUser: {
+                enabled: true,
+            },
         },
         advanced: {
             ipAddress: {
